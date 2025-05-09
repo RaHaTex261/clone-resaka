@@ -1,0 +1,101 @@
+name: CI/CD Ndao Iresaka
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+        mongodb-version: ['4.4', '5.0']
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configuration Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Démarrage MongoDB
+      uses: supercharge/mongodb-github-action@1.10.0
+      with:
+        mongodb-version: ${{ matrix.mongodb-version }}
+
+    - name: Installation des dépendances
+      run: npm ci
+    
+    - name: Vérification du style de code
+      run: npm run lint
+      
+    - name: Exécution des tests
+      run: npm test
+      env:
+        CI: true
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Configuration Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Installation des dépendances
+      run: npm ci
+    
+    - name: Construction
+      run: npm run build --if-present
+    
+    - name: Archive de production
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist
+        path: |
+          dist
+          package.json
+          package-lock.json
+          
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Téléchargement des artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: dist
+        
+    - name: Configuration SSH et déploiement
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts
+        
+        # Déploiement via rsync
+        rsync -avz --delete ./ $DEPLOY_USER@$DEPLOY_HOST:/var/www/ndao-iresaka/
+        
+        # Redémarrage du service
+        ssh $DEPLOY_USER@$DEPLOY_HOST 'cd /var/www/ndao-iresaka && npm install && pm2 restart ndao-iresaka'
