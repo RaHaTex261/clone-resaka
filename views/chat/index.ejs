@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+        integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+        crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <title><%= title %></title>
+</head>
+<body>
+    <!-- Titre principal de l'application de chat -->
+    <h1 class="title">Ndao-Iresaka 💬</h1>
+
+    <div class="chat-container">
+        <!-- Liste des utilisateurs -->
+        <div class="users-sidebar">
+            <h3 class="users-title">Utilisateurs</h3>
+            <ul class="users-list" id="users-list">
+                <!-- La liste des utilisateurs sera injectée ici par JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Section principale contenant le chat -->
+        <div class="main">
+            <!-- En-tête du chat -->
+            <div class="chat-header">
+                <div class="connection-status">
+                    <span class="status-indicator" id="status-indicator"></span>
+                    <span class="current-user-status">
+                        <span class="current-user-name" id="current-user-name"></span>
+                        <span class="status-text">En ligne</span>
+                    </span>
+                </div>
+                <div class="recipient-info" id="recipient-info">
+                    <!-- Le nom du destinataire sera affiché ici -->
+                </div>
+                <button id="logout-button" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i> Déconnexion
+                </button>
+            </div>
+
+            <!-- Conteneur des messages -->
+            <ul class="message-container" id="message-container"></ul>
+
+            <!-- Formulaire d'envoi de message -->
+            <form class="message-form" id="message-form">
+                <!-- Champ de saisie du message texte -->
+                <input
+                    type="text"
+                    name="message"
+                    id="message-input"
+                    class="message-input"
+                    placeholder="Écris un message ou enregistre 🎤"
+                />
+                <!-- Séparateur vertical -->
+                <div class="v-divider"></div>
+
+                <!-- Bouton d'enregistrement vocal -->
+                <button type="button" class="mic-button" id="mic-button" title="Envoyer un message vocal">
+                    <i class="fas fa-microphone"></i>
+                </button>
+
+                <!-- Bouton d'envoi du message -->
+                <button type="submit" class="send-button">
+                    Envoyer <span><i class="fas fa-paper-plane"></i></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.28.0/moment.min.js"
+        integrity="sha512-Q1f3TS3vSt1jQ8AwP2OuenztnLU6LwxgyyYOG1jgMW/cbEMHps/3wjvnl1P3WTrF3chJUWEoxDUEjMxDV8pujg=="
+        crossorigin="anonymous"
+    ></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.28.0/locale/fr.js"></script>
+    <script>
+        moment.locale('fr'); // Configuration de moment.js en français
+        // Personnalisation de la traduction pour "il y a quelques secondes"
+        moment.updateLocale('fr', {
+            relativeTime: {
+                s: 'à l\'instant',
+                ss: 'à l\'instant'
+            }
+        });
+    </script>
+    <script src="/js/chat.js"></script>
+
+    <!-- Modal pour le choix de chiffrement -->
+    <div id="encryption-modal" class="modal">
+        <div class="modal-content">
+            <h2>Options d'envoi du message</h2>
+            <div class="modal-options">
+                <button id="send-encrypted" class="modal-button">
+                    <i class="fas fa-lock"></i> Chiffrer le message
+                </button>
+                <button id="send-plain" class="modal-button">
+                    <i class="fas fa-lock-open"></i> Envoyer sans chiffrement
+                </button>
+            </div>
+            <div id="password-section" class="password-section" style="display: none;">
+                <input type="password" id="encryption-password" placeholder="Entrez le mot de passe de chiffrement" class="password-input">
+                <button id="confirm-send" class="modal-button confirm-button">
+                    Confirmer l'envoi
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

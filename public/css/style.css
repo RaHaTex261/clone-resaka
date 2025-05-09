@@ -1,0 +1,717 @@
+/* Variables de couleurs et thème */
+:root {
+    --primary-color: #2d3436;
+    --secondary-color: #636e72;
+    --accent-color: #00b894;
+    --background-color: #f5f6fa;
+    --text-color: #2d3436;
+    --message-sent-color: #87CEEB; /* Bleu ciel pour les messages envoyés */
+    --message-received-color: #90EE90; /* Vert clair pour les messages reçus */
+    --input-border-color: #ddd;
+    --button-hover-color: #009b7d;
+    --status-online: #2ecc71;
+    --status-offline: #e74c3c;
+    --selected-user-bg: #e8f5ff;
+    --unread-badge-bg: #e74c3c;
+    --read-message-color: #7f8c8d;
+}
+
+/* Styles de base et réinitialisation */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+    scroll-behavior: smooth;
+}
+
+/* Style du corps de la page */
+html, body {
+    height: 100%;
+    width: 100%;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+/* Style du titre principal */
+.title {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    font-size: 32px;
+    color: var(--primary-color);
+    background-color: #ffffffcc;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Conteneur principal du chat avec sidebar */
+.chat-container {
+    display: flex;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Styles pour la sidebar des utilisateurs */
+.users-sidebar {
+    width: 250px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    height: fit-content;
+}
+
+.users-title {
+    font-size: 18px;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.users-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.user-item:hover {
+    background-color: var(--selected-user-bg);
+}
+
+.user-item.active {
+    background-color: var(--selected-user-bg);
+    border-left: 3px solid var(--accent-color);
+}
+
+.user-item .status-indicator {
+    margin-right: 10px;
+}
+
+.user-item .username {
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+/* Style pour le badge de messages non lus */
+.unread-badge {
+    background-color: var(--unread-badge-bg);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Conteneur principal du chat */
+.main {
+    flex: 1;
+    min-width: 0; /* Pour éviter le débordement */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* En-tête du chat */
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 10px 10px 0 0;
+    margin-bottom: 10px;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--secondary-color);
+}
+
+.connection-status .status-text {
+    font-weight: 500;
+}
+
+.recipient-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.recipient-info .username {
+    font-size: 18px;
+}
+
+.recipient-info .status-indicator {
+    margin: 0;
+}
+
+.recipient-info.hidden {
+    display: none;
+}
+
+/* Zone de saisie du nom d'utilisateur */
+.name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 700;
+    padding: 10px 20px;
+    color: var(--text-color);
+    background-color: #f0f0f0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-grow: 1;
+}
+
+.logout-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+.name-input {
+    padding: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+    flex-grow: 1;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    margin-left: 12px;
+    outline: none;
+    background-color: #f0f0f0;
+}
+
+/* Conteneur des messages */
+.message-container {
+    height: 400px;
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+    list-style: none;
+    background-color: #fafafa;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Styles des messages */
+.message-left, .message-right {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 10px 16px;
+    margin: 8px;
+    max-width: 70%;
+    font-size: 16px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.message-right {
+    justify-content: flex-end;
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.message-left .message {
+    background: var(--message-received-color);
+    color: var(--primary-color); /* Couleur de texte plus foncée pour la lisibilité */
+    border-radius: 16px 16px 16px 0;
+    align-self: flex-start;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.message-right .message {
+    background: var(--message-sent-color);
+    color: var(--primary-color); /* Couleur de texte plus foncée pour la lisibilité */
+    border-radius: 16px 16px 0 16px;
+    align-self: flex-end;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.message.read span {
+    color: var(--read-message-color);
+}
+
+.message.read::after {
+    content: "✓✓";
+    font-size: 12px;
+    color: var(--accent-color);
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+}
+
+.message-left > p > span,
+.message-right > p > span {
+    display: block;
+    font-style: italic;
+    font-size: 12px;
+    margin-top: 6px;
+    color: #888;
+}
+
+/* Styles pour le feedback de saisie */
+.feedback {
+    font-style: italic;
+    font-size: 14px;
+    padding: 10px;
+    color: #444;
+    text-align: center;
+}
+
+.message-feedback {
+    text-align: center;
+    color: var(--secondary-color);
+    font-style: italic;
+    animation: typing 1s infinite;
+}
+
+/* Formulaire d'envoi de message */
+.message-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+}
+
+.message-input {
+    flex-grow: 1;
+    padding: 10px;
+    height: 48px;
+    font-size: 16px;
+    border: 1px solid var(--secondary-color);
+    border-radius: 5px;
+    outline: none;
+    background-color: #fff;
+}
+
+/* Boutons du formulaire */
+.send-button, .mic-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.send-button {
+    background: var(--accent-color);
+    color: white;
+    height: 48px;
+    font-size: 16px;
+    margin-left: 8px;
+}
+
+.send-button:hover {
+    background-color: #357ABD;
+}
+
+.mic-button {
+    background: transparent;
+    color: var(--secondary-color);
+    font-size: 22px;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.mic-button:hover {
+    transform: scale(1.2);
+    color: #e60000;
+}
+
+.mic-button i {
+    font-size: 20px;
+}
+
+/* Compteur de clients connectés */
+.clients-total {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    color: var(--secondary-color);
+    background-color: #f9f9f9;
+}
+
+/* Séparateur vertical */
+.v-divider {
+    width: 1px;
+    height: 30px;
+    background: var(--secondary-color);
+    margin: 0 10px;
+}
+
+.message-container audio {
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Styles pour la page de login */
+.login-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color);
+}
+
+.login-box {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-title {
+    text-align: center;
+    color: var(--primary-color);
+    margin-bottom: 2rem;
+    font-size: 24px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.form-group input {
+    padding: 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.login-button {
+    background-color: var(--accent-color);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: var(--button-hover-color);
+}
+
+.auth-link {
+    text-align: center;
+    margin-top: 1rem;
+    color: var(--secondary-color);
+}
+
+.auth-link a {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+@keyframes typing {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+}
+
+/* Styles pour l'indicateur de statut */
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.status-indicator.online {
+    background-color: var(--status-online);
+    box-shadow: 0 0 5px var(--status-online);
+}
+
+.status-indicator.offline {
+    background-color: var(--status-offline);
+    box-shadow: 0 0 5px var(--status-offline);
+}
+
+/* Styles pour le nom de l'utilisateur connecté */
+.current-user-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-user-name {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.status-text {
+    color: var(--secondary-color);
+    font-size: 14px;
+}
+
+/* Styles pour le modal de chiffrement */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    width: 90%;
+    max-width: 500px;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.modal h2 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.modal-options {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.modal-button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-button:hover {
+    background-color: #0056b3;
+}
+
+.password-section {
+    margin-top: 15px;
+}
+
+.password-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.confirm-button {
+    width: 100%;
+    background-color: #28a745;
+}
+
+.confirm-button:hover {
+    background-color: #218838;
+}
+
+/* Style du menu déroulant de déchiffrement */
+.message .message-actions {
+    position: relative;
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.decrypt-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.decrypt-button {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.decrypt-button:hover {
+    background-color: #f5f5f5;
+    border-color: #aaa;
+}
+
+.decrypt-button i {
+    font-size: 14px;
+}
+
+.decrypt-section {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 12px;
+    margin-top: 5px;
+    min-width: 250px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.decrypt-section.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.decrypt-section input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.decrypt-section input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.decrypt-section button {
+    width: 100%;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.decrypt-section button:hover {
+    background-color: var(--button-hover-color);
+}
+
+/* Animation du dropdown */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.decrypt-section.show {
+    display: block;
+    animation: slideDown 0.3s ease forwards;
+}
